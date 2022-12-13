@@ -1,0 +1,338 @@
+openapi: 3.0.3
+info:
+  title: Swagger Buying Frenzy - OpenAPI 3.0
+  description: >-
+    This is a Buying Frenzy Server based on the OpenAPI 3.0 specification.
+
+
+    Some useful links:
+
+    - [Buying
+    Frenzy](https://gist.github.com/seahyc/97b154ce5bfd4f2b6e3a3a99a7b93f69)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost/api
+tags:
+  - name: restaurant
+    description: Everything about Restaurant
+    externalDocs:
+      description: Find out more
+      url: https://gist.github.com/seahyc/97b154ce5bfd4f2b6e3a3a99a7b93f69
+  - name: order
+    description: Processing Order
+    externalDocs:
+      description: Find out more
+      url: https://gist.github.com/seahyc/97b154ce5bfd4f2b6e3a3a99a7b93f69
+paths:
+  /restaurants/top:
+    get:
+      tags:
+        - restaurant
+      summary: Finds Top Y Restaurant
+      description: >-
+        List top y restaurants that have more or less than x number of dishes
+        within a price range, ranked alphabetically. More or less (than x) is a
+        parameter that the API allows the consumer to enter.
+      operationId: getWithMenus
+      parameters:
+        - name: no_of_restaurant
+          in: query
+          description: top y restaurants
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: no_of_dish_gt
+          in: query
+          description: more than x number of dishes
+          required: true
+          schema:
+            type: integer
+        - name: no_of_dish_lt
+          in: query
+          description: less than x number of dishes
+          required: true
+          schema:
+            type: integer
+        - name: start_price
+          in: query
+          description: Start price range
+          required: true
+          schema:
+            type: number
+        - name: end_price
+          in: query
+          description: End price range
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: success query
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Invalid parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+  /restaurants:
+    get:
+      tags:
+        - restaurant
+      summary: List all restaurants that are open at a certain datetime.
+      description: List all restaurants that are open at a certain datetime.
+      operationId: getWithOpenHour
+      parameters:
+        - name: datetime
+          in: query
+          description: date time in yyyy-mm-dd HH:MM
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Invalid parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+  /restaurants/search:
+    get:
+      tags:
+        - restaurant
+      summary: Search by name
+      description: >-
+        Search for restaurants or dishes by name, ranked by relevance to search
+        term
+      operationId: getByName
+      parameters:
+        - name: name
+          in: query
+          description: Any name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Invalid parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - api_key: []
+        - petstore_auth:
+            - write:pets
+            - read:pets
+  /orders:
+    post:
+      tags:
+        - order
+      summary: User order a dish from restaurant
+      description: Process a user purchasing a dish from a restaurant
+      operationId: create
+      requestBody:
+        description: Create order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - petstore_auth:
+            - write:pets
+            - read:pets
+components:
+  schemas:
+    Order:
+      type: object
+      required:
+        - amount
+        - user
+        - restaurant
+        - date
+        - menu
+      properties:
+        amount:
+          type: number
+          format: decimal
+          example: 12.1
+        user:
+          type: integer
+          format: int32
+          example: 1
+        restaurant:
+          type: integer
+          format: int32
+          example: 2
+        date:
+          type: string
+          format: date-time
+          example: 2022-12-22T18:00:00.000Z
+        menu:
+          type: array
+          items:
+            $ref: '#/components/schemas/Menu'
+      xml:
+        name: order
+    Restaurant:
+      type: object
+      required:
+        - id
+        - name
+        - balance
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 13
+        name:
+          type: string
+          example: 2 Cents
+        balance:
+          type: number
+          example: 4632.74
+        createdAt:
+          type: string
+          example: 2022-12-13T09:31:15.895Z
+        updatedAt:
+          type: string
+          example: 2022-12-13T09:31:15.895Z
+    Menu:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        amount:
+          type: integer
+          format: int32
+          example: 1
+        price:
+          type: number
+          format: decimal
+          example: 12.1
+      xml:
+        name: category
+    OrderResponse:
+      type: object
+      required:
+        - id
+        - amount
+        - menu
+        - price
+        - restaurant
+        - date
+        - updatedAt
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        amount:
+          type: integer
+          format: int32
+          example: 1
+        menu:
+          type: integer
+          format: int32
+          example: 1
+        price:
+          type: number
+          format: decimal
+          example: 12.1
+        restaurant:
+          type: integer
+          format: int32
+          example: 1
+        date:
+          type: string
+          format: date
+          example: 2022-12-22T10:00:00.000Z
+        updatedAt:
+          type: string
+          format: date
+          example: 2022-12-13T15:25:56.147Z
+        createdAt:
+          type: string
+          format: date
+          example: 2022-12-13T15:25:56.147Z
+      xml:
+        name: '##default'
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Required 'xxx' param missing
+  securitySchemes:
+    petstore_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
+          scopes:
+            write:pets: modify pets in your account
+            read:pets: read your pets
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
