@@ -2,7 +2,8 @@ const db = require("../models");
 const Restaurant = db.restaurants;
 
 const BAD_REQUEST = 400;
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const days = ["Sun", 'Mon', 'Tues', 'Weds', 'Thurs', 'Fri', 'Sat' ];
+// const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 // API 1
 // List all restaurants that are open at a certain datetime
