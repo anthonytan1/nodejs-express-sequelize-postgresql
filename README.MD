@@ -19,3 +19,7 @@ To create user:
 # Building Docker Image
 `docker build . -t buyingfrenzy/node-web-app`
 `docker run -p 49160:8080 -d buyingfrenzy/node-web-app`
+
+# API Documentation
+Can be seen in https://github.com/anthonytan1/nodejs-express-sequelize-postgresql/blob/main/swagger.yaml, copy paste the value in https://editor.swagger.io/
+
